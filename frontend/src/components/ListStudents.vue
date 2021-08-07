@@ -9,7 +9,9 @@
           single-line
           hide-details
         ></v-text-field>
-        <v-btn rounded dark color="primary" class="ml-2">Cadastrar Aluno</v-btn>
+        <v-btn href="/cadastro" rounded dark color="primary" class="ml-2"
+          >Cadastrar Aluno</v-btn
+        >
       </v-card-title>
 
       <v-data-table
