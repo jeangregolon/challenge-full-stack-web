@@ -1,16 +1,16 @@
 <template>
   <div class="cadastro">
     <h1 class="display-1 text-center my-3">Cadastro de aluno</h1>
-    <create-students />
+    <student-form />
   </div>
 </template>
 
 <script>
-import CreateStudents from "../components/CreateStudents.vue";
+import StudentForm from "../components/StudentForm.vue";
 
 export default {
   components: {
-    "create-students": CreateStudents,
+    "student-form": StudentForm,
   },
 };
 </script>
