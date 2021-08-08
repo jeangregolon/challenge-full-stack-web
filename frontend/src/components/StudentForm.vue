@@ -1,6 +1,7 @@
 <template>
   <v-container>
     <v-card>
+      <!-- Form start -->
       <v-form class="pa-4">
         <v-text-field
           prepend-icon="mdi-account"
@@ -50,6 +51,66 @@
         </v-btn>
       </v-form>
     </v-card>
+    <!-- Form end -->
+    <!-- Loading Dialog start -->
+    <template>
+      <v-dialog v-model="loadingDialog" persistent max-width="680px">
+        <v-card>
+          <v-card-title class="justify-center text-h4">
+            Salvando...
+          </v-card-title>
+          <v-card-subtitle class="text-center pt-5">
+            <v-icon x-large class="pr-3">mdi-loading mdi-spin</v-icon>
+          </v-card-subtitle>
+        </v-card>
+      </v-dialog>
+    </template>
+    <!-- Loading Dialog end -->
+
+    <!-- Next Dialog start -->
+    <template>
+      <v-dialog v-model="nextDialog" persistent max-width="680px">
+        <v-card>
+          <v-card-title class="justify-center text-h4">
+            Cadastro salvo com sucesso!
+          </v-card-title>
+          <v-card-subtitle class="text-center text-h5 pt-2">
+            O que deseja fazer a seguir?
+          </v-card-subtitle>
+          <v-card-actions class="text-center">
+            <v-spacer></v-spacer>
+            <v-flex class="px-auto">
+              <v-btn color="green darken-1" text @click="nextDialog = false">
+                Cadastrar novo aluno
+              </v-btn>
+              <v-btn color="green darken-1" text href="/consulta">
+                Voltar à consulta
+              </v-btn>
+            </v-flex>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </template>
+    <!-- Next Dialog end -->
+
+    <!-- Invalid Dialog start -->
+    <template>
+      <v-dialog v-model="invalidDialog" max-width="680px">
+        <v-card>
+          <v-card-title class="justify-center text-h4">
+            Dados inválidos
+          </v-card-title>
+          <v-card-subtitle class="text-center text-h5 pt-2">
+            Revise os dados e tente novamente
+          </v-card-subtitle>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn text @click="invalidDialog = false"> OK </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </template>
+    <!-- Invalid Dialog end -->
   </v-container>
 </template>
 
@@ -66,12 +127,17 @@ export default {
     cpf: { required, minLength: minLength(14) },
   },
 
-  data: () => ({
-    name: "",
-    email: "",
-    cpf: "",
-    ra: "",
-  }),
+  data() {
+    return {
+      name: "",
+      email: "",
+      cpf: "",
+      ra: "",
+      loadingDialog: false,
+      nextDialog: false,
+      invalidDialog: false,
+    };
+  },
 
   computed: {
     nameErrors() {
@@ -101,6 +167,26 @@ export default {
   methods: {
     submit() {
       this.$v.$touch();
+      if (this.$v.$invalid) {
+        this.invalidDialog = true;
+      } else {
+        this.loadingDialog = true;
+        this.$http
+          .post("http://localhost:5000/estudantes", {
+            name: this.name,
+            email: this.email,
+            cpf: this.cpf,
+          })
+          .then(function (data) {
+            this.loadingDialog = false;
+            if (data.status === 200) {
+              this.nextDialog = true;
+            } else {
+              console.log("fail");
+            }
+            this.clear();
+          });
+      }
     },
     clear() {
       this.$v.$reset();
