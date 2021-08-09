@@ -1,0 +1,13 @@
+{
+  "name": "challenge-full-stack-web",
+  "version": "1.0.0",
+  "repository": "https://github.com/jeangregolon/challenge-full-stack-web.git",
+  "author": "Jean Gregolon <jean.gregolon@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "concurrently": "^6.2.1"
+  },
+  "scripts": {
+    "start": "concurrently \"cd backend && npm run start\" \"cd frontend && npm run serve\""
+  }
+}
