@@ -120,8 +120,7 @@ export default {
       });
     },
     editItem(student) {
-      // this.$router.push({ path: `/cadastro/${student.id}` });
-      console.log("Editar" + student.id);
+      this.$router.push({ name: "Cadastro", params: { student: student } });
     },
     confirmDelete(item) {
       this.studentToDelete = item;

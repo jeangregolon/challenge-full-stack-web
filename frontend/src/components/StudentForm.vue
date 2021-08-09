@@ -1,5 +1,6 @@
 <template>
   <v-container>
+    <h2 v-if="editing" class="text-center mb-3">Editando RA {{ this.ra }}</h2>
     <v-card>
       <!-- Form start -->
       <v-form class="pa-4">
@@ -28,15 +29,15 @@
           :error-messages="cpfErrors"
           label="CPF"
           required
+          :disabled="editing === true"
           @input="$v.cpf.$touch()"
           @blur="$v.cpf.$touch()"
         ></v-text-field>
         <v-text-field
           prepend-icon="mdi-badge-account"
           v-model="ra"
-          label="RA"
+          label="RA (Gerado automaticamente)"
           class="pb-4"
-          readonly
           disabled
         ></v-text-field>
 
@@ -111,6 +112,22 @@
       </v-dialog>
     </template>
     <!-- Invalid Dialog end -->
+
+    <!-- Updated Dialog start -->
+    <template>
+      <v-dialog v-model="updatedDialog" max-width="680px">
+        <v-card>
+          <v-card-title class="justify-center text-h4">
+            Cadastro editado com sucesso!
+          </v-card-title>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="green darken-1" text href="/consulta"> OK </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </template>
+    <!-- Updated Dialog end -->
   </v-container>
 </template>
 
@@ -133,12 +150,24 @@ export default {
       email: "",
       cpf: "",
       ra: "",
+      student: null,
       loadingDialog: false,
       nextDialog: false,
       invalidDialog: false,
+      updatedDialog: false,
+      editing: false,
     };
   },
-
+  created() {
+    if (this.$route.params.student) {
+      this.student = this.$route.params.student;
+      this.name = this.student.name;
+      this.email = this.student.email;
+      this.cpf = this.student.cpf;
+      this.ra = this.student.id;
+      this.editing = true;
+    }
+  },
   computed: {
     nameErrors() {
       const errors = [];
@@ -169,30 +198,49 @@ export default {
       this.$v.$touch();
       if (this.$v.$invalid) {
         this.invalidDialog = true;
-      } else {
-        this.loadingDialog = true;
-        this.$http
-          .post("http://localhost:5000/estudantes", {
-            name: this.name,
-            email: this.email,
-            cpf: this.cpf,
-          })
-          .then(function (data) {
-            this.loadingDialog = false;
-            if (data.status === 200) {
-              this.nextDialog = true;
-            } else {
-              console.log("fail");
-            }
-            this.clear();
-          });
+      } else if (this.editing) {
+        this.studentUpdate();
+      } else if (!this.editing) {
+        this.studentCreate();
       }
+    },
+    studentCreate() {
+      this.loadingDialog = true;
+      this.$http
+        .post("http://localhost:5000/estudantes", {
+          name: this.name,
+          email: this.email,
+          cpf: this.cpf,
+        })
+        .then(function (data) {
+          this.loadingDialog = false;
+          if (data.status === 200) {
+            this.nextDialog = true;
+          }
+          this.clear();
+        });
+    },
+    studentUpdate() {
+      this.loadingDialog = true;
+      this.$http
+        .put("http://localhost:5000/estudantes/" + this.ra, {
+          name: this.name,
+          email: this.email,
+        })
+        .then(function (data) {
+          this.loadingDialog = false;
+          if (data.status === 200) {
+            this.updatedDialog = true;
+          }
+        });
     },
     clear() {
       this.$v.$reset();
       this.name = "";
       this.email = "";
-      this.cpf = "";
+      if (!this.editing) {
+        this.cpf = "";
+      }
     },
   },
 };
