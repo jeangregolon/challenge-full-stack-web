@@ -19,6 +19,7 @@
         :headers="headers"
         :items="students"
         :items-per-page="5"
+        :loading="loading"
         no-data-text="Não há alunos cadastrados."
         loading-text="Carregando..."
       >
@@ -27,6 +28,12 @@
             mdi-pencil
           </v-icon>
           <v-icon small @click="confirmDelete(item)"> mdi-delete </v-icon>
+        </template>
+        <template v-slot:[`item.createdAt`]="{ item }">
+          {{ formatDate(item.createdAt) }}
+        </template>
+        <template v-slot:[`item.updatedAt`]="{ item }">
+          {{ formatDate(item.updatedAt) }}
         </template>
       </v-data-table>
     </v-card>
@@ -90,10 +97,12 @@
 </template>
 
 <script>
+import moment from "moment";
 export default {
   data() {
     return {
       search: "",
+      loading: false,
       headers: [
         { text: "RA", value: "id" },
         { text: "NOME", value: "name" },
@@ -115,8 +124,10 @@ export default {
   },
   methods: {
     loadStudents() {
+      this.loading = true;
       this.$http.get("http://localhost:5000/estudantes").then(function (data) {
         this.students = data.body;
+        this.loading = false;
       });
     },
     editItem(student) {
@@ -136,6 +147,9 @@ export default {
           this.loadStudents();
           this.successDeleteDialog = true;
         });
+    },
+    formatDate(value) {
+      return moment(value).locale("pt-br").format("L");
     },
   },
 };
