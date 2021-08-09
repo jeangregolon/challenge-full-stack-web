@@ -66,7 +66,7 @@
       <v-dialog v-model="loadingDialog" persistent max-width="680px">
         <v-card>
           <v-card-title class="justify-center text-h4">
-            Excluido cadastro...
+            Excluindo cadastro...
           </v-card-title>
           <v-card-subtitle class="text-center pt-5">
             <v-icon x-large class="pr-3">mdi-loading mdi-spin</v-icon>
